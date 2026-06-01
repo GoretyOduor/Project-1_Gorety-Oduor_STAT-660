@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapping Global Happiness: Data Visualization Project</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid #eaeaea;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 40px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-left: 4px solid #2980b9;
+            color: #333;
+            page-break-inside: avoid;
+            font-family: Consolas, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 1.6em;
+            max-width: 100%;
+            overflow: auto;
+            padding: 1em 1.5em;
+            display: block;
+            word-wrap: break-word;
+        }
+        .visual-container {
+            text-align: center;
+            margin: 30px 0;
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #eaeaea;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        .interpretation {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin-top: 15px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Mapping Global Happiness: Data Visualization Project 1</h1>
+        <p>An exploratory data analysis of the World Happiness Report (2017-2020)</p>
+    </header>
+
+    <main>
+        <section id="introduction">
+            <h2>Project Overview</h2>
+            <p>This data visualization project utilizes the World Happiness Report datasets spanning the four years from 2017 to 2020. The datasets provide annual rankings of global happiness and include the underlying metrics that contribute to a country's overall score. The visualizations below explore global rankings, multi-year trends, economic correlations, and geographic distributions.</p>
+        </section>
+
+        <section id="part1">
+            <h2>Part 1: Top 10 Happiest Countries (2020)</h2>
+            <p><strong>Goal:</strong> Identify the top 10 happiest countries in the most recent year available and create a barplot arranged in decreasing order.</p>
+            <pre><code># Load the necessary library
+library(ggplot2)
+
+# Sort the 2020 data from highest to lowest happiness score and take the top 10
+top_10_2020 <- head(data_2020[order(-data_2020$Ladder.score), ], 10)
+
+# Create the barplot arranged in decreasing order by height
+ggplot(top_10_2020, aes(x = reorder(Country.name, -Ladder.score), y = Ladder.score)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  theme_minimal() +
+  labs(
+    title = "Top 10 Happiest Countries (2020)", 
+    x = "Country", 
+    y = "Happiness Score"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+            <div class="interpretation">
+                <p><strong>Analysis:</strong> The data correctly identifies Finland, Denmark, Switzerland, Iceland, Norway, Netherlands, Sweden, New Zealand, Austria, and Luxembourg as the top 10 happiest countries globally in 2020.</p>
+            </div>
+        </section>
+
+        <section id="part2">
+            <h2>Part 2: Four-Year Trend for Specific Countries</h2>
+            <p><strong>Goal:</strong> Visualize how the happiness score changed over the 4 years for China, India, USA, Indonesia, Japan, and Russia.</p>
+            <pre><code># Extract relevant columns, standardize names, and add a Year column
+df_2017 <- data.frame(Country = data_2017$Country, Score = data_2017$Happiness.Score, Year = 2017)
+df_2018 <- data.frame(Country = data_2018$Country.or.region, Score = data_2018$Score, Year = 2018)
+df_2019 <- data.frame(Country = data_2019$Country.or.region, Score = data_2019$Score, Year = 2019)
+df_2020 <- data.frame(Country = data_2020$Country.name, Score = data_2020$Ladder.score, Year = 2020)
+
+# Combine and filter
+all_years <- rbind(df_2017, df_2018, df_2019, df_2020)
+target_countries <- c("China", "India", "United States", "Indonesia", "Japan", "Russia")
+trend_data <- subset(all_years, Country %in% target_countries)
+
+# Create the line visual with legends
+ggplot(trend_data, aes(x = Year, y = Score, color = Country, group = Country)) +
+  geom_line(size = 1) +
+  geom_point(size = 3) +
+  theme_minimal() +
+  labs(title = "Happiness Score Trend (2017-2020)", x = "Year", y = "Happiness Score", color = "Country") +
+  scale_x_continuous(breaks = c(2017, 2018, 2019, 2020))</code></pre>
+            
+            <div class="visual-container">
+                <!-- Using %20 for spaces in the filename -->
+                <img src="Happiness%20Score%20Trend%20(2017-2020).jpg" alt="Line graph of happiness trends for select countries">
+            </div>
+
+            <div class="interpretation">
+                <p><strong>Graph Interpretation:</strong> The line graph reveals that among the six selected countries, the United States maintained the highest and most stable happiness score from 2017 to 2020. Conversely, India recorded the lowest scores and suffered the most significant continuous decline over the four-year period. Furthermore, while countries like Japan and China remained relatively stable, Russia experienced a steady decrease in its national happiness score.</p>
+            </div>
+        </section>
+
+        <section id="part3">
+            <h2>Part 3: Consistently Top 10 Countries (2017–2020)</h2>
+            <p><strong>Goal:</strong> Identify which countries have consistently ranked as the top 10 happiest countries across all 4 years.</p>
+            <pre><code># Get the top 10 countries for each year
+top10_2017 <- head(data_2017[order(-data_2017$Happiness.Score), ]$Country, 10)
+top10_2018 <- head(data_2018[order(-data_2018$Score), ]$Country.or.region, 10)
+top10_2019 <- head(data_2019[order(-data_2019$Score), ]$Country.or.region, 10)
+top10_2020 <- head(data_2020[order(-data_2020$Ladder.score), ]$Country.name, 10)
+
+# Find the countries that appear in all four lists
+consistent_top_countries <- intersect(
+  intersect(intersect(top10_2017, top10_2018), top10_2019), top10_2020
+)
+print(consistent_top_countries)</code></pre>
+            <div class="interpretation">
+                <p><strong>Analysis:</strong> By analyzing the top 10 happiest countries for each individual year, we found that 8 countries consistently ranked in the top 10 across all four years from 2017 to 2020. These consistent top performers are primarily Northern and Western European nations (Norway, Denmark, Iceland, Switzerland, Finland, Netherlands, and Sweden), along with New Zealand.</p>
+            </div>
+        </section>
+
+        <section id="part4">
+            <h2>Part 4: Correlation Between GDP per Capita and Happiness</h2>
+            <p><strong>Goal:</strong> Create a scatter plot with GDP per capita on the x-axis, happiness score on the y-axis, and year as a legend title to explore their correlation.</p>
+            <pre><code># Standardize columns and bind datasets (using Explained GDP for 2020 to match scales)
+df17_gdp <- data.frame(Country = data_2017$Country, Happiness_Score = data_2017$Happiness.Score, GDP_per_Capita = data_2017$Economy..GDP.per.Capita., Year = 2017)
+df18_gdp <- data.frame(Country = data_2018$Country.or.region, Happiness_Score = data_2018$Score, GDP_per_Capita = data_2018$GDP.per.capita, Year = 2018)
+df19_gdp <- data.frame(Country = data_2019$Country.or.region, Happiness_Score = data_2019$Score, GDP_per_Capita = data_2019$GDP.per.capita, Year = 2019)
+df20_gdp <- data.frame(Country = data_2020$Country.name, Happiness_Score = data_2020$Ladder.score, GDP_per_Capita = data_2020$Explained.by..Log.GDP.per.capita, Year = 2020)
+
+merged_gdp_data <- rbind(df17_gdp, df18_gdp, df19_gdp, df20_gdp)
+merged_gdp_data$Year <- as.factor(merged_gdp_data$Year)
+
+# Create the scatter plot
+ggplot(merged_gdp_data, aes(x = GDP_per_Capita, y = Happiness_Score, color = Year)) +
+  geom_point(alpha = 0.6) +
+  theme_minimal() +
+  labs(
+    title = "Correlation between GDP per Capita and Happiness Score (2017-2020)",
+    x = "GDP per Capita",
+    y = "Happiness Score",
+    color = "Year" 
+  )</code></pre>
+
+            <div class="visual-container">
+                <!-- Using %20 for spaces in the filename -->
+                <img src="Correlation%20between%20GDP%20per%20Capita%20and%20Happiness%20Score%20(2017-2020).jpg" alt="Scatter plot of GDP vs Happiness">
+            </div>
+
+            <div class="interpretation">
+                <p><strong>Graph Interpretation:</strong> The scatter plot displays a clear, positive correlation between GDP per capita and happiness scores—as a country's economic output increases, its happiness score generally trends upwards. When analyzing the points by year (indicated by the color legend), the overall positive trajectory remains highly consistent across all four years from 2017 to 2020, meaning the fundamental relationship between national wealth and subjective well-being did not drastically change during this period.</p>
+            </div>
+        </section>
+
+        <section id="part5">
+            <h2>Part 5: Happiness Distribution by Region (2020)</h2>
+            <p><strong>Goal:</strong> Use the "GNI2014" dataset from the treemap package to define regions, then create box plots comparing happiness distributions.</p>
+            <pre><code>library(treemap)
+data(GNI2014)
+
+# Merge 2020 data with GNI2014 to get the regional (continent) classifications
+merged_2020_region <- merge(data_2020, GNI2014, by.x = "Country.name", by.y = "country", all.x = TRUE)
+
+# Create the box plot
+ggplot(subset(merged_2020_region, !is.na(continent)), aes(x = continent, y = Ladder.score, fill = continent)) +
+  geom_boxplot(alpha = 0.8) +
+  theme_minimal() +
+  labs(
+    title = "Distribution of Happiness Scores by Region (2020)",
+    x = "Region (Continent)",
+    y = "Happiness Score",
+    fill = "Region"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+            <div class="interpretation">
+                <p><strong>Graph Interpretation:</strong> The box plot reveals significant variations in happiness across global regions. Europe exhibits the highest overall happiness distribution, with its median score sitting noticeably higher than other regions. In contrast, Africa shows the lowest median happiness score and a tightly clustered distribution toward the bottom of the scale. The Americas and Asia display much wider spreads in their happiness scores, indicating higher internal disparity in subjective well-being among countries within those continents.</p>
+            </div>
+        </section>
+
+        <section id="part6">
+            <h2>Part 6: Impact of Social Support & Life Expectancy</h2>
+            <p><strong>Goal:</strong> Create a bubble plot with life expectancy on the x-axis, social support on the y-axis, and bubble size representing happiness score.</p>
+            <pre><code># Create the bubble plot
+ggplot(data_2020, aes(x = Healthy.life.expectancy, y = Social.support, size = Ladder.score)) +
+  geom_point(alpha = 0.6, color = "darkgreen") +
+  scale_size(range = c(1, 10)) + 
+  theme_minimal() +
+  labs(
+    title = "Impact of Social Support & Life Expectancy on Happiness (2020)",
+    x = "Healthy Life Expectancy",
+    y = "Social Support",
+    size = "Happiness Score"
+  )</code></pre>
+            <div class="interpretation">
+                <p><strong>Graph Interpretation:</strong> The bubble plot illustrates a strong positive relationship between social support, healthy life expectancy, and overall happiness. Countries located in the top-right quadrant—boasting both high social support and long life expectancies—are represented by the largest bubbles, indicating the highest happiness scores. Conversely, countries in the bottom-left quadrant consistently feature the smallest bubbles. This visual confirms that strong social safety nets and better health outcomes jointly contribute to a higher national happiness score.</p>
+            </div>
+        </section>
+
+        <section id="part7">
+            <h2>Part 7: Treemap of Numerical Rankings (2020)</h2>
+            <p><strong>Goal:</strong> Create a treemap for the year 2020, using a color index to display the countries in order of numerical ranking.</p>
+            <pre><code>library(treemap)
+
+# Create a numerical rank column based on the Ladder score
+data_2020$Rank <- rank(-data_2020$Ladder.score)
+
+# Generate the Treemap
+treemap(data_2020,
+        index = "Country.name",     
+        vSize = "Ladder.score",     
+        vColor = "Rank",            
+        type = "value",             
+        title = "Treemap of Happiness Rankings by Country (2020)",
+        palette = "-RdYlBu",        
+        lowerbound.cex.labels = 0.5 
+)</code></pre>
+            
+            <div class="visual-container">
+                <!-- Using %20 for spaces in the filename -->
+                <img src="Treemap%20of%20Happiness%20Rankings%20by%20Country%20(2020).jpg" alt="Treemap of Global Happiness Rankings">
+            </div>
+
+            <div class="interpretation">
+                <p><strong>Graph Interpretation:</strong> The 2020 Treemap effectively visualizes global happiness tiers by mapping numerical ranks to a color gradient. The color-coding allows for immediate visual grouping: light yellow boxes instantly identify the world's happiest countries (primarily in Northern Europe), orange tones highlight mid-ranking nations (such as the US and Japan), and dark red boxes point to the lowest-ranking countries (like India and Haiti). This format provides a comprehensive, at-a-glance summary of global well-being disparities.</p>
+            </div>
+        </section>
+
+        <section id="part8">
+            <h2>Part 8: Global Choropleth Map</h2>
+            <p><strong>Goal:</strong> Modify starter code to create a choropleth map colored by the true happiness score across geographic regions.</p>
+            <pre><code>library(ggplot2)
+library(maps)
+
+# Get world map data
+world_map <- map_data("world")
+
+# Merge the world map data with the 2020 dataset
+merged_data <- merge(world_map, data_2020, by.x = "region", by.y = "Country.name", all.x = TRUE)
+merged_data <- merged_data[order(merged_data$order), ]
+
+# Create the choropleth map
+ggplot(merged_data, aes(x = long, y = lat, group = group, fill = Ladder.score)) +
+  geom_polygon(color = "black", size = 0.1) +
+  coord_fixed(ratio = 1.25) +
+  scale_fill_gradient(low = "red", high = "green", name = "Happiness Score", na.value = "lightgray") +
+  theme_void() + 
+  labs(title = "Choropleth Map of Global Happiness Scores (2020)")</code></pre>
+            <div class="interpretation">
+                <p><strong>Graph Interpretation:</strong> The choropleth map provides a stark geographic visualization of global well-being in 2020. The brightest green regions, indicating the highest happiness scores, are heavily concentrated in North America, Western/Northern Europe, and Australia/New Zealand. Conversely, the darkest red regions, representing the lowest happiness scores, are largely clustered across parts of Sub-Saharan Africa and South Asia. Countries shaded in gray represent regions where 2020 happiness data was unavailable or country name formatting differed.</p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
